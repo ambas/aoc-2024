@@ -17,20 +17,18 @@ struct Day01: AdventDay {
     return [firstArray, secondArray]
   }
 
-  // Replace this with your solution for the first part of the day's challenge.
   func part1() -> Any {
     let entities = self.entities
     let sorted1 = entities[0].sorted()
     let sorted2 = entities[1].sorted()
     let count = sorted1.count
     var diff = 0
-//    for i in 0..<count {
-//      diff += abs(sorted1[i] - sorted2[i])
-//    }
+    for i in 0..<count {
+      diff += abs(sorted1[i] - sorted2[i])
+    }
     return diff
   }
 
-  // Replace this with your solution for the second part of the day's challenge.
   func part2() -> Any {
     var result: Int = 0
     let entities = self.entities
@@ -40,7 +38,6 @@ struct Day01: AdventDay {
       result += (count2[key] ?? 0) * key * count
     }
 
-    print(result)
     return result
   }
 }
