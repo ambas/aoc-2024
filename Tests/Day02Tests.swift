@@ -1,20 +1,14 @@
-// Created by Ambas on 2024/12/02
-
-
 //
-//  Day01.swift
+//  Day02.swift
 //  AdventOfCode
 //
-//  Created by Ambas Chobsanti on 2024/12/01.
+//  Created by Ambas Chobsanti on 2024/12/02.
 //
-
 
 import Testing
 
 @testable import AdventOfCode
 
-// Make a copy of this file for every day to ensure the provided smoke tests
-// pass.
 struct Day02Tets {
   // Smoke test data provided in the challenge question
   let testData = """

@@ -1,8 +1,5 @@
-// Created by Ambas on 2024/12/02
 
-import Algorithms
-
-enum Mode {
+enum OrderMode {
   case increment
   case decrement
 }
@@ -31,10 +28,9 @@ struct Day02: AdventDay {
     return validReports.count
   }
 
-  func checker(report: [Int], mode: Mode, fixQuota: Int = 0) -> Bool {
-    // mode: 0 = decreasing, 1 = increasing
+  func checker(report: [Int], mode: OrderMode, fixQuota: Int = 0) -> Bool {
 
-    func isValidOrder(_ num1: Int, _ num2: Int, _ mode: Mode) -> Bool {
+    func isValidOrder(_ num1: Int, _ num2: Int, _ mode: OrderMode) -> Bool {
       switch mode {
       case .decrement: return num1 >= num2
       case .increment: return num1 <= num2

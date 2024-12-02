@@ -5,13 +5,10 @@
 //  Created by Ambas Chobsanti on 2024/12/01.
 //
 
-
 import Testing
 
 @testable import AdventOfCode
 
-// Make a copy of this file for every day to ensure the provided smoke tests
-// pass.
 struct Day01Tets {
   // Smoke test data provided in the challenge question
   let testData = """
