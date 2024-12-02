@@ -32,8 +32,8 @@ struct Day02: AdventDay {
 
     func isValidOrder(_ num1: Int, _ num2: Int, _ mode: OrderMode) -> Bool {
       switch mode {
-      case .decrement: return num1 >= num2
-      case .increment: return num1 <= num2
+      case .decrement: return num1 > num2
+      case .increment: return num1 < num2
       }
     }
 
@@ -45,10 +45,8 @@ struct Day02: AdventDay {
       var newReport2 = report
       newReport2.remove(at: index - 1)
 
-      return checker(report: newReport1, mode: .decrement, fixQuota: fixQuota - 1)
-        || checker(report: newReport1, mode: .increment, fixQuota: fixQuota - 1)
-        || checker(report: newReport2, mode: .decrement, fixQuota: fixQuota - 1)
-        || checker(report: newReport2, mode: .increment, fixQuota: fixQuota - 1)
+      return checker(report: newReport1, mode: mode, fixQuota: fixQuota - 1)
+        || checker(report: newReport2, mode: mode, fixQuota: fixQuota - 1)
     }
 
     for i in 1..<report.count {
