@@ -32,7 +32,7 @@ struct Day02: AdventDay {
 
   func checker(report: [Int], mode: OrderMode, fixQuota: Int = 0) -> Bool {
 
-    func isValidOrder(_ num1: Int, _ num2: Int, _ mode: OrderMode) -> Bool {
+    func isValidOrder(_ num1: Int, _ num2: Int) -> Bool {
       switch mode {
       case .decrement: num1 > num2
       case .increment: num1 < num2
@@ -52,8 +52,7 @@ struct Day02: AdventDay {
     }
 
     for i in 1..<report.count {
-      let num1 = report[i - 1]
-      let num2 = report[i]
+      let (num1, num2) = (report[i - 1], report[i])
 
       // Check for invalid differences
       let diff = abs(num1 - num2)
@@ -62,7 +61,7 @@ struct Day02: AdventDay {
       }
 
       // Check mode-specific constraints
-      if !isValidOrder(num1, num2, mode) {
+      if !isValidOrder(num1, num2) {
         return attemptFix(report, at: i)
       }
     }
