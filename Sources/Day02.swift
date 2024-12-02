@@ -1,4 +1,3 @@
-
 enum OrderMode {
   case increment
   case decrement
@@ -23,7 +22,8 @@ struct Day02: AdventDay {
 
   func part2() -> Any {
     let validReports = entities.filter {
-      checker(report: $0, mode: .decrement, fixQuota: 1) || checker(report: $0, mode: .increment, fixQuota: 1)
+      checker(report: $0, mode: .decrement, fixQuota: 1)
+        || checker(report: $0, mode: .increment, fixQuota: 1)
     }
     return validReports.count
   }
