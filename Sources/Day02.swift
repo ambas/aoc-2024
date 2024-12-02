@@ -14,26 +14,28 @@ struct Day02: AdventDay {
   }
 
   func part1() -> Any {
-    let validReports = entities.filter {
-      checker(report: $0, mode: .decrement) || checker(report: $0, mode: .increment)
-    }
-    return validReports.count
+    entities
+      .filter {
+        checker(report: $0, mode: .decrement) || checker(report: $0, mode: .increment)
+      }
+      .count
   }
 
   func part2() -> Any {
-    let validReports = entities.filter {
-      checker(report: $0, mode: .decrement, fixQuota: 1)
-        || checker(report: $0, mode: .increment, fixQuota: 1)
-    }
-    return validReports.count
+    entities
+      .filter {
+        checker(report: $0, mode: .decrement, fixQuota: 1)
+          || checker(report: $0, mode: .increment, fixQuota: 1)
+      }
+      .count
   }
 
   func checker(report: [Int], mode: OrderMode, fixQuota: Int = 0) -> Bool {
 
     func isValidOrder(_ num1: Int, _ num2: Int, _ mode: OrderMode) -> Bool {
       switch mode {
-      case .decrement: return num1 > num2
-      case .increment: return num1 < num2
+      case .decrement: num1 > num2
+      case .increment: num1 < num2
       }
     }
 
