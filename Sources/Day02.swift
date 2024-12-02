@@ -39,7 +39,7 @@ struct Day02: AdventDay {
       }
     }
 
-    func attemptFix(_ report: [Int], at index: Int) -> Bool {
+    func attemptFix(at index: Int) -> Bool {
       guard fixQuota > 0 else { return false }
 
       var newReport1 = report
@@ -54,15 +54,10 @@ struct Day02: AdventDay {
     for i in 1..<report.count {
       let (num1, num2) = (report[i - 1], report[i])
 
-      // Check for invalid differences
+      // Check for invalid differences and Check mode-specific constraints
       let diff = abs(num1 - num2)
-      if diff < 1 || diff > 3 {
-        return attemptFix(report, at: i)
-      }
-
-      // Check mode-specific constraints
-      if !isValidOrder(num1, num2) {
-        return attemptFix(report, at: i)
+      if (diff < 1 || diff > 3) || !isValidOrder(num1, num2) {
+        return attemptFix(at: i)
       }
     }
 
