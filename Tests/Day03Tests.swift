@@ -5,7 +5,6 @@
 //  Created by Ambas Chobsanti on 2024/12/03.
 //
 
-
 import Testing
 
 @testable import AdventOfCode
@@ -14,31 +13,20 @@ import Testing
 // pass.
 struct Day03Tests {
   // Smoke test data provided in the challenge question
-  let testData = """
-    1000
-    2000
-    3000
-
-    4000
-
-    5000
-    6000
-
-    7000
-    8000
-    9000
-
-    10000
-
+  let testData1 = """
+    xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))
+    """
+  let testData2 = """
+    xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))
     """
 
   @Test func testPart1() async throws {
-    let challenge = Day00(data: testData)
-    #expect(String(describing: challenge.part1()) == "6000")
+    let challenge = Day03(data: testData1)
+    #expect(String(describing: challenge.part1()) == "161")
   }
 
   @Test func testPart2() async throws {
-    let challenge = Day00(data: testData)
-    #expect(String(describing: challenge.part2()) == "32000")
+    let challenge = Day03(data: testData2)
+    #expect(String(describing: challenge.part2()) == "48")
   }
 }
