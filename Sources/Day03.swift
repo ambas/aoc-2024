@@ -5,8 +5,6 @@
 //  Created by Ambas Chobsanti on 2024/12/03.
 //
 
-import Algorithms
-
 struct Day03: AdventDay {
 
   var data: String
