@@ -16,24 +16,24 @@ struct Day03: AdventDay {
   }
 
   func part1() -> Int {
-    calculateResult(from: entities, withInstructionMode: false)
+    calculateResult(from: entities)
   }
 
   func part2() -> Int {
-    calculateResult(from: entities, withInstructionMode: true)
+    calculateResult(from: entities, instructionMode: true)
   }
 
-  private func calculateResult(from entities: [Character], withInstructionMode instructionMode: Bool) -> Int {
-    findMulFunction(entities, instructionMode: instructionMode)
+  func calculateResult(from entities: [Character], instructionMode: Bool = false) -> Int {
+    findMulFunctionIndexes(in: entities, instructionMode: instructionMode)
       .compactMap { index in
-        guard let (num1, num2) = findValue(start: index, in: entities) else { return nil }
-        return num1 * num2
+        // Compute product if value exists
+        findValue(start: index, in: entities).map { $0.0 * $0.1 }
       }
-      .reduce(0, +)
+      .reduce(0, +)  // Sum up the results
   }
 
-  func findMulFunction(_ input: [Character], instructionMode: Bool = false) -> [Int] {
-    var resultIndices: [Int] = []
+  private func findMulFunctionIndexes(in input: [Character], instructionMode: Bool = false) -> [Int] {
+    var resultIndexes: [Int] = []
     var isEnabled = true
     var buffer = ""
 
@@ -48,28 +48,27 @@ struct Day03: AdventDay {
         isEnabled = false
         buffer.removeAll()
       case "mul" where isEnabled || !instructionMode:
-        resultIndices.append(index)
+        resultIndexes.append(index)
         buffer.removeAll()
       case let prefix where isValidPrefix(prefix):
-        // Keep buffering for valid prefixes
-        continue
+        continue  // Continue buffering for valid prefixes
       default:
         buffer.removeAll()  // Reset buffer for invalid sequences
       }
     }
 
-    return resultIndices
+    return resultIndexes
   }
 
   private func isValidPrefix(_ prefix: String) -> Bool {
-    let validPrefixes = Set([
+    let validPrefixes: Set<String> = [
       "d", "do", "do(", "don", "don'", "don't", "don't(",
       "m", "mu",
-    ])
+    ]
     return validPrefixes.contains(prefix)
   }
 
-  func findValue(start: Int, in input: [Character]) -> (Int, Int)? {
+  private func findValue(start: Int, in input: [Character]) -> (Int, Int)? {
     guard start < input.count - 1 else { return nil }
     let openParenthesesIndex = start + 1
     guard input[openParenthesesIndex] == "(" else { return nil }
@@ -77,18 +76,15 @@ struct Day03: AdventDay {
     let startNumberIndex = openParenthesesIndex + 1
     let endNumberIndex = min(startNumberIndex + 10, input.count - 1)
 
-    let substring = input[startNumberIndex..<endNumberIndex]
-      .split(separator: ")")
-      .first
-
-    guard let pair = substring else { return nil }
-    let components = pair.split(separator: ",").map { String($0) }
-
-    guard components.count == 2,
-      let num1 = Int(components[0]),
-      let num2 = Int(components[1])
+    guard
+      let pair = input[startNumberIndex..<endNumberIndex]
+        .split(separator: ")")
+        .first
     else { return nil }
 
-    return (num1, num2)
+    let components = pair.split(separator: ",").compactMap { Int(String($0)) }
+    guard components.count == 2 else { return nil }
+
+    return (components[0], components[1])
   }
 }
