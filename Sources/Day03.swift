@@ -1,10 +1,3 @@
-//
-//  Day03.swift
-//  AdventOfCode
-//
-//  Created by Ambas Chobsanti on 2024/12/03.
-//
-
 struct Day03: AdventDay {
 
   var data: String
@@ -30,7 +23,9 @@ struct Day03: AdventDay {
       .reduce(0, +)  // Sum up the results
   }
 
-  private func findMulFunctionIndexes(in input: [Character], instructionMode: Bool = false) -> [Int] {
+  private func findMulFunctionIndexes(
+    in input: [Character], instructionMode: Bool = false
+  ) -> [Int] {
     var resultIndexes: [Int] = []
     var isEnabled = true
     var buffer = ""
