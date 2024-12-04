@@ -1,9 +1,7 @@
-
 struct Day04: AdventDay {
   // Save your data in a corresponding text file in the `Data` directory.
   var data: String
 
-  // Splits input data into its component parts and convert from string.
   var entities: [[Character]] {
     data.split(separator: "\n").map {
       Array($0)
@@ -12,7 +10,6 @@ struct Day04: AdventDay {
 
   let target = Array("XMAS")
 
-  // Replace this with your solution for the first part of the day's challenge.
   func part1() -> Any {
     let grid = entities
     let (rowCount, colCount) = (grid.count, grid[0].count)
@@ -29,7 +26,6 @@ struct Day04: AdventDay {
     var res = 0
     for row in 0..<rowCount {
       for col in 0..<colCount where grid[row][col] == "X" {
-//        print(row,col,res)
         res += dfs([row, col], 0, [[0, 1]])
         res += dfs([row, col], 0, [[1, 0]])
         res += dfs([row, col], 0, [[0, -1]])
@@ -38,14 +34,12 @@ struct Day04: AdventDay {
         res += dfs([row, col], 0, [[-1, -1]])
         res += dfs([row, col], 0, [[-1, 1]])
         res += dfs([row, col], 0, [[1, -1]])
-
-//        print(res)
       }
     }
     return res
   }
 
-  func makeNei(_ point: [Int],_ direction: [[Int]], _ rowCount: Int, _ colCount: Int) -> [[Int]] {
+  func makeNei(_ point: [Int], _ direction: [[Int]], _ rowCount: Int, _ colCount: Int) -> [[Int]] {
     direction.compactMap {
       let newRow = point[0] + $0[0]
       let newCol = point[1] + $0[1]
@@ -57,58 +51,37 @@ struct Day04: AdventDay {
     }
   }
 
-
-
-  // Replace this with your solution for the second part of the day's challenge.
   func part2() -> Any {
     let grid = entities
     let (rowCount, colCount) = (grid.count, grid[0].count)
-    func checkValid(_ point:[Int]) -> Bool {
+    func checkValid(_ point: [Int]) -> Bool {
       let (row, col) = (point[0], point[1])
       return row >= 0 && row < rowCount && col >= 0 && col < colCount
     }
-    func checkIsMAS(_ point: [Int], _ direction: [Int]) -> Bool {
-      var (row, col) = (point[0], point[1])
-      if !checkValid([row, col]) { return false }
-      if grid[row][col] != "M" { return false }
-      row += direction[0]
-      col += direction[1]
-      if !checkValid([row, col]) { return false }
-      if grid[row][col] != "A" { return false }
-      row += direction[0]
-      col += direction[1]
-      if !checkValid([row, col]) { return false }
-      if grid[row][col] != "S" { return false }
-      return true
-    }
 
-    func checkIsSAM(_ point: [Int], _ direction: [Int]) -> Bool {
+    func check(_ point: [Int], _ direction: [Int], _ target: String) -> Bool {
+      let target = Array(target)
       var (row, col) = (point[0], point[1])
-      if !checkValid([row, col]) { return false }
-      if grid[row][col] != "S" { return false }
-      row += direction[0]
-      col += direction[1]
-      if !checkValid([row, col]) { return false }
-      if grid[row][col] != "A" { return false }
-      row += direction[0]
-      col += direction[1]
-      if !checkValid([row, col]) { return false }
-      if grid[row][col] != "M" { return false }
+      for i in 0..<3 {
+        guard checkValid([row, col]) && grid[row][col] == target[i] else { return false }
+        row += direction[0]
+        col += direction[1]
+      }
+
       return true
     }
 
     var res = 0
     for row in 0..<rowCount {
       for col in 0..<colCount {
-        if checkIsMAS([row,col], [1,1]) || checkIsSAM([row,col], [1,1]) {
-          if checkIsMAS([row,col + 2], [1,-1]) || checkIsSAM([row,col + 2], [1,-1]) {
-            res += 1
-          }
+        let foundStartX = check([row, col], [1, 1], "MAS") || check([row, col], [1, 1], "SAM")
+        if foundStartX {
+          let foundEndX = check([row, col + 2], [1, -1], "MAS") || check([row, col + 2], [1, -1], "SAM")
+          res += foundEndX ? 1 : 0
         }
       }
     }
     return res
   }
-
 
 }
