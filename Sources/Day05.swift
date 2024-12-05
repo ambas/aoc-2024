@@ -4,85 +4,71 @@ import Algorithms
 import Foundation
 
 struct Day05: AdventDay {
-  // Save your data in a corresponding text file in the `Data` directory.
-  var data: String
+    var data: String
 
-  // Splits input data into its component parts and convert from string.
-  var entities: (firstPart: [(Int, Int)], secondPart: [[Int]]) {
-    let splited = data.split(separator: "\n\n")
-    let firstPart = splited[0].split(separator: "\n").map {
-      let pair = String($0).split(separator: "|")
-      return (Int(pair[0])!, Int(pair[1])!)
-    }
-    let secondPart = splited[1].split(separator: "\n").map {
-      $0.split(separator: ",").map { Int(String($0))! }
-    }
-    return (firstPart, secondPart)
-  }
-
-  // Replace this with your solution for the first part of the day's challenge.
-  func part1() -> Any {
-    let entities = entities
-
-    var dict = [Int: Set<Int>]()
-    for pair in entities.firstPart {
-      dict[pair.0, default: []].insert(pair.1)
-    }
-
-    let validRow = entities.secondPart.filter { check($0, dict) }
-
-    return validRow.map { getMid($0) }.reduce(0, +)
-  }
-
-  func getMid(_ nums: [Int]) -> Int {
-    let count = nums.count
-    return nums[count / 2]
-  }
-
-  func check(_ nums: [Int], _ rules: [Int: Set<Int>]) -> Bool {
-    var set = Set<Int>()
-    for num in nums {
-      if let target = rules[num] {
-        for a in target {
-          if set.contains((a)) { return false }
+    var entities: (rules: [(Int, Int)], rows: [[Int]]) {
+        let sections = data.split(separator: "\n\n")
+        let rules = sections[0].split(separator: "\n").map {
+            let pair = $0.split(separator: "|").map { Int($0)! }
+            return (pair[0], pair[1])
         }
-      }
-      set.insert(num)
-    }
-    return true
-  }
-
-  func part2() -> Any {
-    let entities = entities
-
-    var rules = [Int: Set<Int>]()
-    for pair in entities.firstPart {
-      rules[pair.0, default: []].insert(pair.1)
+        let rows = sections[1].split(separator: "\n").map {
+            $0.split(separator: ",").map { Int($0)! }
+        }
+        return (rules, rows)
     }
 
-    let invalidRow = entities.secondPart.filter { !check($0, rules) }
+    func part1() -> Int {
+        let rules = createRulesDict(from: entities.rules)
+        let validRows = entities.rows.filter { isValidRow($0, with: rules) }
+        return validRows.map { getMid($0) }.reduce(0, +)
+    }
 
-    func fixInvalidRow(_ row: [Int]) -> [Int] {
-      var res = [Int]()
-      var set = Set<Int>()
-      for num in row {
-        if let target = rules[num], set.intersection(target).count > 0 {
-          for i in 0..<res.count {
-            if target.contains(res[i]) {
-              res.insert(num, at: i)
-              break
+    func part2() -> Int {
+        let rules = createRulesDict(from: entities.rules)
+        let invalidRows = entities.rows.filter { !isValidRow($0, with: rules) }
+
+        let fixedRows = invalidRows.map { fixInvalidRow($0, rules: rules) }
+        return fixedRows.map { getMid($0) }.reduce(0, +)
+    }
+
+    // Helper to calculate the middle element of an array
+    private func getMid(_ nums: [Int]) -> Int {
+        nums[nums.count / 2]
+    }
+
+    // Helper to validate rows against rules
+    private func isValidRow(_ row: [Int], with rules: [Int: Set<Int>]) -> Bool {
+        var seen = Set<Int>()
+        for num in row {
+            if let targets = rules[num], !targets.isDisjoint(with: seen) {
+                return false
             }
-          }
-        } else {
-          res.append(num)
+            seen.insert(num)
         }
-        set.insert(num)
-      }
-
-      return res
+        return true
     }
-    let res = invalidRow.map { fixInvalidRow($0) }
-    let recheck = res.filter { check($0, rules) }
-    return res.map { getMid($0) }.reduce(0, +)
-  }
+
+    // Helper to fix invalid rows
+    private func fixInvalidRow(_ row: [Int], rules: [Int: Set<Int>]) -> [Int] {
+        var result = [Int]()
+        var seen = Set<Int>()
+
+        for num in row {
+            if let targets = rules[num], !seen.isDisjoint(with: targets),
+               let index = result.firstIndex(where: { targets.contains($0) }) {
+                result.insert(num, at: index)
+            } else {
+                result.append(num)
+            }
+            seen.insert(num)
+        }
+
+        return result
+    }
+
+    // Helper to create a rules dictionary
+    private func createRulesDict(from rules: [(Int, Int)]) -> [Int: Set<Int>] {
+        rules.reduce(into: [Int: Set<Int>]()) { $0[$1.0, default: []].insert($1.1) }
+    }
 }
