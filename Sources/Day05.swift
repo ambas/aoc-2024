@@ -25,15 +25,11 @@ struct Day05: AdventDay {
     let entities = entities
 
     var dict = [Int: Set<Int>]()
-    var dict2 = [Int: Int]()
     for pair in entities.firstPart {
       dict[pair.0, default: []].insert(pair.1)
     }
-    for pair in entities.firstPart {
-      dict2[pair.1] = pair.0
-    }
 
-    let validRow = entities.secondPart.filter { check($0, dict, dict2) }
+    let validRow = entities.secondPart.filter { check($0, dict) }
 
     return validRow.map { getMid($0) }.reduce(0, +)
   }
@@ -43,7 +39,7 @@ struct Day05: AdventDay {
     return nums[count / 2]
   }
 
-  func check(_ nums: [Int], _ rules: [Int: Set<Int>], _ rules2: [Int: Int]) -> Bool {
+  func check(_ nums: [Int], _ rules: [Int: Set<Int>]) -> Bool {
     var set = Set<Int>()
     for num in nums {
       if let target = rules[num] {
@@ -56,11 +52,37 @@ struct Day05: AdventDay {
     return true
   }
 
-  // Replace this with your solution for the second part of the day's challenge.
   func part2() -> Any {
-    // Sum the maximum entries in each set of data
-    return 0
+    let entities = entities
+
+    var rules = [Int: Set<Int>]()
+    for pair in entities.firstPart {
+      rules[pair.0, default: []].insert(pair.1)
+    }
+
+    let invalidRow = entities.secondPart.filter { !check($0, rules) }
+
+    func fixInvalidRow(_ row: [Int]) -> [Int] {
+      var res = [Int]()
+      var set = Set<Int>()
+      for num in row {
+        if let target = rules[num], set.intersection(target).count > 0 {
+          for i in 0..<res.count {
+            if target.contains(res[i]) {
+              res.insert(num, at: i)
+              break
+            }
+          }
+        } else {
+          res.append(num)
+        }
+        set.insert(num)
+      }
+
+      return res
+    }
+    let res = invalidRow.map { fixInvalidRow($0) }
+    let recheck = res.filter { check($0, rules) }
+    return res.map { getMid($0) }.reduce(0, +)
   }
 }
-
-// 7750
