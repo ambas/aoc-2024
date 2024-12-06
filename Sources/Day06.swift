@@ -27,7 +27,7 @@ struct Day06: AdventDay {
     while true {
       res.insert(pos)
       switch curr {
-      case .change(let _direction):
+      case .change(let _direction, _):
         direction = _direction
         curr = makeNext(grid, currDirection: direction, currPos: pos)
       case .next(let _pos):
@@ -41,8 +41,58 @@ struct Day06: AdventDay {
 
   // Replace this with your solution for the second part of the day's challenge.
   func part2() -> Any {
-    // Sum the maximum entries in each set of data
-    return 0
+    var walls = Set<[Int]>()
+    var (grid, direction, pos)  = cleanUpGrid(entities)
+    let (rowCount, colCount) = (grid.count, grid[0].count)
+    func check(_ pos: [Int]) -> Bool {
+      let (row, col) = (pos[0], pos[1])
+      return row >= 0 && row < rowCount && col >= 0 && col < colCount
+    }
+    func buildNewWall(_ pos: [Int], _ direction: Character) -> [Int]? {
+      let (row, col) = (pos[0], pos[1])
+      switch direction {
+        case "^":
+        for i in 0..<row where walls.contains([i, col]) {
+          return [row, col - 1]
+        }
+      case "v":
+        for i in (row + 1)..<rowCount where walls.contains([i, col]) {
+          return [row, col + 1]
+        }
+      case "<":
+        for i in 0..<col where walls.contains([row, i]) {
+          return [row + 1, col]
+        }
+      case ">":
+        for i in (col + 1)..<colCount where walls.contains([row, i]) {
+          return [row - 1, col]
+        }
+      default:
+        fatalError()
+      }
+      return nil
+    }
+    var curr = makeNext(grid, currDirection: direction, currPos: pos)
+    var buildWall = Set<[Int]>()
+    a: while true {
+      switch curr {
+      case .change(let _direction, let wall):
+        walls.insert(wall)
+        direction = _direction
+        curr = makeNext(grid, currDirection: direction, currPos: pos)
+      case .next(let _pos):
+        pos = _pos
+        if let wall = buildNewWall(pos, map[direction]!), check(wall) {
+          buildWall.insert(wall)
+        }
+        curr = makeNext(grid, currDirection: direction, currPos: pos)
+      case .end: break a
+      }
+    }
+    for wall in walls {
+      buildWall.remove(wall)
+    }
+    return buildWall.count
   }
 
   func makeNext(_ grid: [[Character]], currDirection: Character, currPos: [Int]) -> ResultMove {
@@ -71,12 +121,12 @@ struct Day06: AdventDay {
     if nextPosVal == "." {
       return .next(nextPos)
     } else {
-      return .change(map[currDirection]!)
+      return .change(map[currDirection]!, nextPos)
     }
   }
   enum ResultMove {
     case next([Int])
-    case change(Character)
+    case change(Character, [Int])
     case end
   }
 
@@ -108,3 +158,5 @@ struct Day06: AdventDay {
     return (res, d, pos)
   }
 }
+
+// 1468 wrong
