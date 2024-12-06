@@ -40,62 +40,66 @@ struct Day06: AdventDay {
   }
 
   func findExitStep(entities: [[Character]]) -> Int? {
-    var (grid, direction, currentPos) = makeCleanGrid(entities)
-    var steps = Set<[Int]>()
-    var currentAction = makeNextAction(grid, currDirection: direction, currPos: currentPos)
-    var walls = Set<[Int]>()
-    while true {
-      steps.insert(currentPos)
-      switch currentAction {
-      case .change(let _direction, let wall):
-        let key = wall + [mapDirection[String(_direction)]!]
-        if walls.contains(key) {
-          return nil
-        }
-        walls.insert(key)
-        direction = _direction
-        currentAction = makeNextAction(grid, currDirection: direction, currPos: currentPos)
-      case .next(let _pos):
-        currentPos = _pos
-        currentAction = makeNextAction(grid, currDirection: direction, currPos: currentPos)
-      case .end: return steps.count
+      var (grid, direction, currentPos) = makeCleanGrid(entities)
+      var visitedSteps = Set<[Int]>()
+      var walls = Set<[Int]>()
+
+      while true {
+          visitedSteps.insert(currentPos)
+          let currentAction = makeNextAction(grid, currDirection: direction, currPos: currentPos)
+
+          switch currentAction {
+          case .change(let newDirection, let wall):
+              let wallKey = wall + [mapDirection[String(newDirection)]!]
+              if walls.contains(wallKey) {
+                  return nil
+              }
+              walls.insert(wallKey)
+              direction = newDirection
+
+          case .next(let nextPos):
+              currentPos = nextPos
+
+          case .end:
+              return visitedSteps.count
+          }
       }
-    }
-    return steps.count
   }
 
   func makeNextAction(
-    _ grid: [[Character]],
-    currDirection: Character,
-    currPos: [Int]
+      _ grid: [[Character]],
+      currDirection: Character,
+      currPos: [Int]
   ) -> Action {
-    let (rowCount, colCount) = (grid.count, grid[0].count)
-    let (row, col) = (currPos[0], currPos[1])
-    var nextPos: [Int]!
-    switch currDirection {
-    case "^":
-      nextPos = [row - 1, col]
-    case "v":
-      nextPos = [row + 1, col]
-    case "<":
-      nextPos = [row, col - 1]
-    case ">":
-      nextPos = [row, col + 1]
-    default:
-      fatalError()
-    }
+      let directions: [Character: (Int, Int)] = [
+          "^": (-1, 0),
+          "v": (1, 0),
+          "<": (0, -1),
+          ">": (0, 1)
+      ]
 
-    let (nextRow, nextCol) = (nextPos[0], nextPos[1])
-    if nextRow < 0 || nextRow >= rowCount || nextCol < 0 || nextCol >= colCount {
-      return .end
-    }
+      guard let movement = directions[currDirection] else {
+          fatalError("Invalid direction: \(currDirection)")
+      }
 
-    let nextPosVal = grid[nextPos[0]][nextPos[1]]
-    if nextPosVal == "." {
-      return .next(nextPos)
-    } else {
-      return .change(mapNextDirection[currDirection]!, nextPos)
-    }
+      let (row, col) = (currPos[0], currPos[1])
+      let nextPos = [row + movement.0, col + movement.1]
+      let (nextRow, nextCol) = (nextPos[0], nextPos[1])
+
+      guard (0..<grid.count).contains(nextRow), (0..<grid[0].count).contains(nextCol) else {
+          return .end
+      }
+
+      let nextPosVal = grid[nextRow][nextCol]
+      if nextPosVal == "." {
+          return .next(nextPos)
+      }
+
+      guard let newDirection = mapNextDirection[currDirection] else {
+          fatalError("Invalid mapping for current direction: \(currDirection)")
+      }
+
+      return .change(newDirection, nextPos)
   }
 
   enum Action {
