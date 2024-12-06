@@ -18,28 +18,28 @@ struct Day06: AdventDay {
   }
 
   func part1() -> Any {
-    return findExitStep(entities: entities) ?? 0
+    return findExitStep(entities: entities).count
   }
 
   func part2() -> Any {
     let entities = entities
+    let guardPath = findExitStep(entities: entities)
     let (rowCount, colCount) = (entities.count, entities[0].count)
     var res = 0
     for row in 0..<rowCount {
-      for col in 0..<colCount where entities[row][col] == "." {
+      for col in 0..<colCount where entities[row][col] == "." && guardPath.contains([row, col]) {
         var entities = entities
         entities[row][col] = "#"
-        if findExitStep(entities: entities) == nil {
+        if findExitStep(entities: entities).isEmpty {
           res += 1
         }
       }
     }
-
     return res
 
   }
 
-  func findExitStep(entities: [[Character]]) -> Int? {
+  func findExitStep(entities: [[Character]]) -> Set<[Int]> {
       var (grid, direction, currentPos) = makeCleanGrid(entities)
       var visitedSteps = Set<[Int]>()
       var walls = Set<[Int]>()
@@ -52,7 +52,7 @@ struct Day06: AdventDay {
           case .change(let newDirection, let wall):
               let wallKey = wall + [mapDirection[String(newDirection)]!]
               if walls.contains(wallKey) {
-                  return nil
+                  return []
               }
               walls.insert(wallKey)
               direction = newDirection
@@ -61,7 +61,7 @@ struct Day06: AdventDay {
               currentPos = nextPos
 
           case .end:
-              return visitedSteps.count
+              return visitedSteps
           }
       }
   }
