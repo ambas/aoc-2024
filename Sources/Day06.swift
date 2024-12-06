@@ -13,21 +13,98 @@ struct Day06: AdventDay {
   var data: String
 
   // Splits input data into its component parts and convert from string.
-  var entities: [[Int]] {
-    data.split(separator: "\n\n").map {
-      $0.split(separator: "\n").compactMap { Int($0) }
+  var entities: [[Character]] {
+    data.split(separator: "\n").map {
+      Array($0)
     }
   }
 
   // Replace this with your solution for the first part of the day's challenge.
   func part1() -> Any {
-    // Calculate the sum of the first set of input data
-    entities.first?.reduce(0, +) ?? 0
+    var (grid, direction, pos)  = cleanUpGrid(entities)
+    var res = Set<[Int]>()
+    var curr = makeNext(grid, currDirection: direction, currPos: pos)
+    while true {
+      res.insert(pos)
+      switch curr {
+      case .change(let _direction):
+        direction = _direction
+        curr = makeNext(grid, currDirection: direction, currPos: pos)
+      case .next(let _pos):
+        pos = _pos
+        curr = makeNext(grid, currDirection: direction, currPos: pos)
+      case .end: return res.count
+      }
+    }
+    return res.count
   }
 
   // Replace this with your solution for the second part of the day's challenge.
   func part2() -> Any {
     // Sum the maximum entries in each set of data
-    entities.map { $0.max() ?? 0 }.reduce(0, +)
+    return 0
+  }
+
+  func makeNext(_ grid: [[Character]], currDirection: Character, currPos: [Int]) -> ResultMove {
+    let (rowCount, colCount) = (grid.count, grid[0].count)
+    let (row, col) = (currPos[0], currPos[1])
+    var nextPos: [Int]!
+    switch currDirection {
+      case "^":
+      nextPos = [row - 1, col]
+    case "v":
+      nextPos = [row + 1, col]
+    case "<":
+      nextPos = [row, col - 1]
+    case ">":
+      nextPos = [row, col + 1]
+    default:
+      fatalError()
+    }
+
+    let (nextPosRow, nextPosCol) = (nextPos[0], nextPos[1])
+    if nextPosRow < 0 || nextPosRow >= rowCount || nextPosCol < 0 || nextPosCol >= colCount {
+      return .end
+    }
+
+    let nextPosVal = grid[nextPos[0]][nextPos[1]]
+    if nextPosVal == "." {
+      return .next(nextPos)
+    } else {
+      return .change(map[currDirection]!)
+    }
+  }
+  enum ResultMove {
+    case next([Int])
+    case change(Character)
+    case end
+  }
+
+  let map: [Character: Character] = [
+    "^": ">",
+    "v": "<",
+    "<":"^",
+    ">":"v"
+  ]
+
+  func cleanUpGrid(_ grid: [[Character]]) -> ([[Character]], Character, [Int]) {
+    let (rowCount , colCount) = (grid.count, grid[0].count)
+    var res = grid
+    var d: Character = "^"
+    var pos = [Int]()
+
+    for row in 0..<rowCount {
+      for col in 0..<colCount {
+        let val = grid[row][col]
+        if map.keys.contains(val) {
+          d = val
+          pos = [row, col]
+          res[row][col] = "."
+        } else {
+          res[row][col] = val
+        }
+      }
+    }
+    return (res, d, pos)
   }
 }
