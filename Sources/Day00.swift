@@ -1,3 +1,6 @@
+// Created by Ambas on 2024/12/09
+
+
 import Algorithms
 
 struct Day00: AdventDay {
