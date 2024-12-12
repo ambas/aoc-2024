@@ -55,10 +55,46 @@ struct Day08: AdventDay {
     return [(newRow * 2) + row2, (newCol * 2) + col2]
   }
 
+  func calNewPoint2(_ point1: [Int], _ point2: [Int], _ rowCount: Int, _ colCount: Int) -> [[Int]] {
+    let (row1, col1) = (point1[0], point1[1])
+    let (row2, col2) = (point2[0], point2[1])
+
+    let (newRow, newCol) = (row1 - row2, col1 - col2)
+    var res = [[Int]]()
+    var curr = 2
+    var newPoint = [(newRow * curr) + row2, (newCol * curr) + col2]
+    while checkInBoard(newPoint, rowCount, colCount) {
+      res.append(newPoint)
+      curr += 2
+      newPoint = [(newRow * curr) + row2, (newCol * curr) + col2]
+    }
+    return res
+  }
+
   // Replace this with your solution for the second part of the day's challenge.
   func part2() -> Any {
-    // Sum the maximum entries in each set of data
-    return 0
+    let entities = entities
+    let (rowCount , colCount) = (entities.count, entities[0].count)
+    var dict = [Character: [[Int]]]()
+    for row in 0..<rowCount {
+      for col in 0..<colCount where entities[row][col] != "." {
+        let val = entities[row][col]
+        dict[val, default: []].append([row, col])
+      }
+    }
+    print(dict)
+    var newPoints = Set<[Int]>()
+    for (_, val) in dict {
+      let pointCount = val.count
+      for i in 0..<pointCount {
+        for j in 0..<pointCount where i != j {
+          let newPoint = calNewPoint2(val[i], val[j], rowCount, colCount)
+          newPoint.forEach { newPoints.insert($0) }
+        }
+      }
+    }
+    print(newPoints)
+    return newPoints.count
   }
 }
 
