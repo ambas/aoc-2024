@@ -46,7 +46,38 @@ struct Day12: AdventDay {
 
   // Replace this with your solution for the second part of the day's challenge.
   func part2() -> Any {
-    return 0
+    let entities = self.entities
+    let (rowCount, colCount) = (entities.count, entities[0].count)
+    var allAreas = [[[Int]]]()
+    var visited = Set<[Int]>()
+    // Get all areas
+    for row in 0..<rowCount {
+      for col in 0..<colCount where !visited.contains([row, col]) {
+        var area: [[Int]] = []
+        traverse(
+          point: [row, col],
+          collector: &area,
+          char: entities[row][col],
+          visited: &visited,
+          matrix: entities
+        )
+        allAreas.append(area)
+
+      }
+    }
+    // Calculate cost for each area
+    var res = 0
+    for area in allAreas {
+      let top = findTop(area, entities)
+      let left = findLeft(area, entities)
+      let right = findRight(area, entities)
+      let bot = findBot(area, entities)
+      let total = top + left + right + bot
+      let newRes = total * area.count
+      res += newRes
+    }
+
+    return res
   }
 
   func makeNeighbors(point: [Int], matrix: [[Character]], skipInvalid: Bool = false)
@@ -110,8 +141,103 @@ struct Day12: AdventDay {
     var curr = 0
     var res = 0
     for row in startRow...endRow {
-      for col in startCol...endCol where matrix[row][col] == char {
+      for col in startCol...endCol {
+        if !area.contains([row, col]) {
+          res += curr
+          curr = 0
+          continue
+        }
         let aboveRow = [row - 1, col]
+        if !checkInBounds(aboveRow, matrix: matrix) {
+          curr = 1
+        } else if matrix[aboveRow[0]][aboveRow[1]] != char {
+          curr = 1
+        } else {
+          res += curr
+          curr = 0
+        }
+      }
+      res += curr
+      curr = 0
+    }
+
+    return res
+
+  }
+
+  func findLeft(_ area: [[Int]], _ matrix: [[Character]]) -> Int {
+    let (startRow, endRow, startCol, endCol) = findBounds(area: area)
+    let char = matrix[area[0][0]][area[0][1]]
+    var curr = 0
+    var res = 0
+    for col in startCol...endCol {
+      for row in startRow...endRow {
+        if !area.contains([row, col]) {
+          res += curr
+          curr = 0
+          continue
+        }
+        let aboveRow = [row, col - 1]
+        if !checkInBounds(aboveRow, matrix: matrix) {
+          curr = 1
+        } else if matrix[aboveRow[0]][aboveRow[1]] != char {
+          curr = 1
+        } else {
+          res += curr
+          curr = 0
+        }
+      }
+      res += curr
+      curr = 0
+    }
+
+    return res
+
+  }
+
+  func findRight(_ area: [[Int]], _ matrix: [[Character]]) -> Int {
+    let (startRow, endRow, startCol, endCol) = findBounds(area: area)
+    let char = matrix[area[0][0]][area[0][1]]
+    var curr = 0
+    var res = 0
+    for col in startCol...endCol {
+      for row in startRow...endRow  {
+        if !area.contains([row, col]) {
+          res += curr
+          curr = 0
+          continue
+        }
+        let aboveRow = [row, col + 1]
+        if !checkInBounds(aboveRow, matrix: matrix) {
+          curr = 1
+        } else if matrix[aboveRow[0]][aboveRow[1]] != char {
+          curr = 1
+        } else {
+          res += curr
+          curr = 0
+        }
+      }
+      res += curr
+      curr = 0
+    }
+
+    return res
+
+  }
+
+  func findBot(_ area: [[Int]], _ matrix: [[Character]]) -> Int {
+    let (startRow, endRow, startCol, endCol) = findBounds(area: area)
+    let char = matrix[area[0][0]][area[0][1]]
+    var curr = 0
+    var res = 0
+    for row in startRow...endRow {
+      for col in startCol...endCol {
+        if !area.contains([row, col]) {
+          res += curr
+          curr = 0
+          continue
+        }
+        let aboveRow = [row + 1, col]
         if !checkInBounds(aboveRow, matrix: matrix) {
           curr = 1
         } else if matrix[aboveRow[0]][aboveRow[1]] != char {
